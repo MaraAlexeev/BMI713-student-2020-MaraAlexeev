@@ -1,0 +1,303 @@
+---
+title: 'Problem Set 2: Git, GitHub, and Data visualization'
+author: "Mara Alexeev"
+date: "9/22/2020"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Overview
+
+## Learning objectives
+
+After attending lecture and upon completion of this problem set you should be able to do the following: 
+
+From Lecture 3:
+
+* Create a project in RStudio
+* Understand the importance of version control
+* Use GitHub to organize and collaborate with others
+
+From Lecture 4:
+
+* Use 'dplyr' to modify data frames/tibbles
+* Use 'ggplot2' to create plots of interesting trends in the data
+* Modify plots' geometric objects, scales, labels, etc.
+
+From Lecture 5:
+
+* Understand how graphs can be used to understand connections within the data
+* Use 'tidygraph' to make graphs
+* Use 'ggraph' to visualize graphs
+
+
+## Instructions:
+
+You are to complete and **upload the Rmd and knitted HTML** of this problem set on to Canvas by *9:44 AM on September 26, 2019*.
+For more information on Rmd files and knitting, please consult the following tutorial from [RStudio](https://rmarkdown.rstudio.com/articles_intro.html) or the [Introduction to R Markdown](https://canvas.harvard.edu/courses/57521/pages/introduction-to-r-markdown) tutorial the TAs have prepared.
+Code should be in the `{r #.#.#}` code chunks and text answer should be in the `txt` blocks.
+Below is an example:
+
+```{r code_0.0.9000}
+# CODE 0a
+df <- cars[1:5, ]
+nrow(df)
+```
+
+```txt
+ANSWER 0a:
+  There are 5 rows in the new data set `df`
+```
+
+If you have any pressing issues, please post on the appropriate Canvas discussion page.
+
+As with all future assignments, this problem set should be version controlled using git documented and submitted through Github (in *addition* to Canvas).
+Follow the directions below before beginning to work on the assignment:
+
+* Within the `BMI713-student-2020-<your GitHub user name>` folder that you created last week, make a subdirectory (ie. folder) within your repository called "Problem Set 3". 
+* Move your copy of the problem set R Markdown to this subdirectory in your new repository (you may want to close RStudio first so it doesn't freak out that a file it is showing is now gone).
+* Commit this change in your repository with the message (or "Summary") "add problem set R Markdown". You may also add a "Description" for the commit if you want to include additional details about the change to repository.
+* Push the changes to origin (ie. your GitHub repository online).
+* As you work on the assignment, continue making commits and pushing changes when appropriate (we'll try to give you some reminders along the way).
+
+Now, you're ready to get started!
+
+
+## Problem 1: Git and GitHub (Total 25 pts)
+
+### 1.1 'Git'ting Started (10 pts)
+
+From previous lectures, you should have GitHub desktop installed (or be comfortable with using git from the command line) and a GitHub account.
+This problem set will be completed in a git repository and pushed to GitHub.
+This will be set-up in this first section of the problem set.
+
+**1.1.1** (2 pts) Open the GitHub desktop application and select "Create a New Repository on your Hard Drive..."; create the repository with the following parameters:
+
+* **Name:** `BMI713-student-2020-<your GitHub user name>`
+* **Description:** (optional) add a brief description about what the repository contains - you can always change this later
+* **Local Path:** select the location on your computer where you want to put the directory for this problem set
+* leave "Initialize this repository with a README" **unchecked**
+* **Git Ignore:** "R"
+* **License:** "None"
+
+What is the complete path name to your repository?
+
+```txt
+Answer 1.1.1
+```
+
+**1.1.2** (2 pts) Within the GitHub desktop application, click "Publish repository" to create a remote repository on GitHub.com.
+Leave "Name" and "Description" as the defaults.
+Ensure that the box for **"Keep this code private"** is checked.
+Set "Organization" to 'hms-dbmi'. (If this option is not available, email a TA.)
+
+Go to the GitHub website and verify that you can see your new repository.
+What is the URL to this repository?
+
+```txt
+Answer 1.1.2
+```
+
+**1.1.3** (3 pts) Make a subdirectory (ie. folder) within your repository called "Problem Set 2".
+Move your copy of the problem set R Markdown to this subdirectory in your new repository (you may want to close RStudio first so it doesn't freak out that a file it is showing is now gone).
+Commit this change in your repository with the message (or "Summary") "add problem set R Markdown".
+You may also add a "Description" for the commit if you want to include additional details about the change to repository.
+Push the changes to origin (ie. your GitHub repository online).
+
+How many files are visible in your GitHub repository online alongside your "Problem Set 2" directory?
+
+```txt
+Answer 1.1.3
+```
+
+**1.1.4** (3 pts) Briefly (1-2 sentences), in your own words, what is the purpose of the gitignore (the `.gitignore`) file?
+
+```txt
+Answer 1.1.4
+```
+
+### 1.2: Submitting through GitHub (15 points)
+
+After you have completed your assignment and knitted the document for the last time, add and commit all of your files (especially the R Markdown for your submission, the knitted HTML, and your output from problem 2.3.6) to your git repository and push to GitHub.com.
+Each commit has a unique identifier (that is how they are tracked simultaneously on your computer and online).
+
+We want the unique identifier of the commit with your final submission, but we cannot include it here because that would be a change to the file that you would then have to commit...
+Instead, we will take this as an opporutinuty to learn about "Issues" on GitHub (the online version).
+Issues are way to submit bug-reports or feature requests to a developer of a project.
+Please create an Issue titled "Submission commit ID" and in the text of the Issue, inlcude the ID of your final commit (either the abbreviated or full ID, is fine) in the body of the Issue.
+
+
+
+## Problem 2: Looking for trends (Total 30 pts)
+
+### 2.1 Tallying up the numbers (5 pts)
+
+Briefly, lets introducing the pipe operator (`%>%`) that is automatically loaded with tidyverse and dplyr packages. The pipe operator is useful when performing sequential operations on data, and also has the benefit of freeing up memory that would usually be taken up by intermediate data elements. Let's load the tidyverse package so that we can use the pipe operator in the code snippets below.
+
+```{r code 2.1.0}
+# tidyverse package includes dplyr
+library(tidyverse)
+```
+
+Now, let's start looking deeper into what locations might be more dangerous.
+
+**2.1.1** (3 pts) 
+
+Using `group_by` and `summarise`, count the number of injuries in each reported location. Which location has the most injuries, and how many does it have? Which location has the fewest injuries, and how many does it have?
+
+```{r code_2.1.1}
+# Code 2.1.1
+library(neiss)
+
+# some code to get you familiarized with how %>% works
+neiss::injuries %>%
+    filter(!is.na(trmt_date)) %>%
+    group_by(location) %>%
+    summarise(num_injuries_per_location = n()) %>%
+    ungroup() %>%
+    arrange(num_injuries_per_location)
+```
+
+```txt
+Answer 2.1.1
+```
+
+**2.1.2** (2 pts) Use the same strategy to count the number of body part injuries. Which body part is injured the most, and how many occurences were there? Which body part was injured the least, and how many occurences were there?
+
+```{r code_2.1.2}
+# Code 2.1.2
+# include your code here
+```
+
+```txt
+Answer 2.1.2
+```
+
+### 2.2 Visualizing trends (15 pts)
+
+Plots may help us visualize these trends even better. We will use 'ggplot2' to make plots that highlight different aspects of the data.
+
+**2.2.1** (3 pts) Make a bar plot with 'ggplot2' that shows the number of injuries by location (please use `%>%` to pipe data to ggplot). Hint: no longer need to explicitly specify data input to `ggplot()` function.
+
+```{r code_2.2.1}
+# Code 2.2.1
+# your code here
+```
+
+**2.2.2** (3 pts) Let's focus on injuries caused by fireworks and bicycles (specifically, "bicycles and accessories, (excl.mountain or all-terrain)"). Find the appropriate product codes, and then make a bar graph with only injuries caused by these products (using the `%>%` for each).
+
+```{r code_2.2.2}
+# Code 2.2.2
+# example to get you familiarized
+fireworks_code <- neiss::products %>%
+    mutate(Product = str_to_lower(title)) %>% 
+    filter(str_detect(Product, "firework")) %>% 
+    pull(code) %>%
+    unique()
+
+# now find bicycle code
+
+# then plot
+```
+
+**2.2.3** (3 pts) Fireworks and bicycles may be associated with different locations of injury, so generate a plot to show the distribution of injury locations faceted by the product (fireworks vs. bicycles) causing the injury. (To make your plot more readable, we'd suggest faceting with the product names, rather than codes, but this is not required) Hint: use `facet_wrap()` function. Again, please use the `%>%` operator.
+
+```{r code_2.2.3}
+# Code 2.2.3
+```
+
+**2.2.4** (3 pts) What if we are interested in differences between males and females, within these product categories specifically? Update your plot to both facet by the product and fill the bars by sex.
+
+```{r code_2.2.4}
+# Code 2.2.4
+```
+
+**2.2.5** (3 pts) There is a lot of information here! What are two observations you can make from this new plot, that you couldn't make from the original barplot in 2.2.1?
+
+```txt
+Answer 2.2.5
+```
+### 2.3 Changing themes (10 pts)
+
+Lastly, let's see how we can customize our bar plot faceted by sex with the `theme` function. This function allows us to change specific components of the plot: everything from the size of the axis labels, to the orientation of the text, and even the background and borders of the plot.
+
+**2.4.1** (5 pts) Use the documentation for the `theme` function (found [here](https://ggplot2.tidyverse.org/reference/theme.html)) and make **five changes** to your plot using the `theme` function. They can be anything you want!
+
+```{r code_2.4.1}
+# Code 2.4.1
+```
+
+## Problem 3: Exploring co-occurence of injuries (35 points)
+
+### 3.1 Create a co-occurence graph (15 points)
+
+Sometimes injuries aren't caused by just one product. In these cases, the NEISS data provides the codes for both products involved. Let's have a look at the co-occurence of products in reported injuries. 
+
+**3.1.1** (5 pts) Create a tibble or data frame called `product_combinations` by grouping by both product codes (in `neiss::injuries`) and adding up the number of cases for each unique combination of product1 (like how we count number of occurences in Problem 2). For now let's assume `prod1` and `prod2` have different meanings, i.e. (prod1, prod2) = (1, 2) is not equivalent to (prod1, prod2) = (2, 1). How many combinations do we have? Please use `%>%` operator.
+
+
+```{r code_3.1.1}
+# Code 3.1.1
+
+```
+
+```txt
+Answer 3.1.1
+```
+
+**3.1.2** (10 pts) Create an `tidygraph` object from `product_combinations` so that each node is a product and each edge represents the co-occurences of products in an injury. The graph should have an edge attribute that represents the number of cases for that product combination. Print your `tidygraph` object and answer the following questions. (Make sure to load the 'tidygraph' package.) Hint: use `as_tbl_graph()`
+
+1. Is your graph directed or undirected?
+2. How many edges does your graph have?
+3. How many nodes does your graph have?
+
+```{r code_3.1.2}
+# Code 3.1.2
+library(tidygraph)
+
+```
+
+```txt
+Answer 3.1.2
+```
+
+### 3.2 Visualize co-occurence graphs (20 points)
+
+**3.2.1** (10 pts) First, only keep the top 95th percentile (not including at 95%) of cooccurances (hint `?quantile`); this makes it easier to visualize. Continue to use this filtered graph for the rest of the problem set. After removing some edges, many nodes will not have any edges. Remove these by filtering out the nodes with degree less than 1. Then, plot the graph using the `plot` function.
+
+```{r code_3.2.1, fig.width=8, fig.height=8}
+# Code 3.2.1
+```
+
+Note how messy the plot of the graph is by default. Further, it is not easy to customize the visualization of the graph using `plot()` (for those interested, [here](https://igraph.org/r/doc/plot.common.html) are the options that can be used with `plot(some_gr, ...)`). Therefore, we recommend using the 'ggraph' package which plots graphs using 'ggplot2'.
+
+**3.2.2** (10 pts) Next, use the `ggraph` package to create a node-link diagram visualization of the graph with (a) a circular layout and (b) a Fruchterman-Rheingold layout. In both cases, nodes must be labeled using the product name and edges must encode the number of cases for the product combination using line thickness.
+
+It may (ie. will) help to set `size = 2` for `geom_node_text()` and use `scale_edge_width_continuous(range = c(0.2, 2))` to make the graph more legible.
+
+(NB: We set the `fig.width` and `fig.height` parameters of these code chunks to make the plots larger than is set by default.)
+
+```{r code_3.2.2, fig.width=8, fig.height=8}
+library(ggraph)
+# Code 3.2.2 part a
+
+# Code 3.2.2 part b
+
+```
+
+---
+
+
+## Submission Reminders
+
+* Do not change the R chunk header information (everything within `{r ... }`).
+* Enter answers into a copy of the R Markdown Problem Set assignment.
+* Only include the final code that you want graded; remove personal notes and `View(some_df)`.
+* Do **not** print out long variables (they create mile-long HTML files).
+* Make sure to submit the R Markdown *and* the knitted-HTML on canvas *AND* on github (15 points on this).
